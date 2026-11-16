@@ -1,49 +1,63 @@
+
 import { useState } from "react";
 import "./AddEditForm.css";
 
 function AddEditForm({ currentTransaction, saveFormData }) {
-  const [title, setFormTitle] = useState(currentTransaction?.title || "");
-  const [amount, setAmount] = useState(currentTransaction?.amount || 0);
-  const [date, setDate] = useState(currentTransaction?.date || "");
+  const [title, setTitle] = useState(currentTransaction?.title || "");
+  const [author, setAuthor] = useState(currentTransaction?.author || "");
+  const [category, setCategory] = useState(currentTransaction?.category || "");
+  const [price, setPrice] = useState(currentTransaction?.price || "");
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     saveFormData({
-      id: currentTransaction?.id,
+      _id: currentTransaction?._id,
       title,
-      amount: Number(amount),
-      date,
+      author,
+      category,
+      price,
     });
-    setFormTitle("");
-    setAmount(0);
-    setDate("");
   };
 
   return (
     <div className="form-container">
       <form className="add-edit-form" onSubmit={handleSubmit}>
-        <label>Title:</label>
+        <h2>{currentTransaction ? "Edit Book" : "Add Book"}</h2>
+
+        <label>Book Title:</label>
         <input
           type="text"
-          name="title"
           value={title}
-          onChange={(e) => setFormTitle(e.target.value)}
+          onChange={(e) => setTitle(e.target.value)}
+          required
         />
-        <label>Amount:</label>
+
+        <label>Author:</label>
+        <input
+          type="text"
+          value={author}
+          onChange={(e) => setAuthor(e.target.value)}
+          required
+        />
+
+        <label>Category:</label>
+        <input
+          type="text"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          required
+        />
+
+        <label>Price:</label>
         <input
           type="number"
-          name="amount"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+          required
         />
-        <label>Date:</label>
-        <input
-          type="date"
-          name="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
-        <button type="submit">Save</button>
+
+        <button type="submit">Save Book</button>
       </form>
     </div>
   );

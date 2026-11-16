@@ -1,72 +1,111 @@
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
 import AddEditForm from "./components/AddEditForm";
 import Header from "./components/Header";
 import "./App.css";
-import calculateTotalExpenses from "./components/calculateTotalExpenses";
+
+const API_URL = "https://books-api-xcu9.onrender.com/api/v1/books";
 
 function App() {
-  const [transactions, setTransactions] = useState([
-    { id: 1, title: "breakfast", amount: 50, date: "2026-10-27" },
-    { id: 2, title: "lunch", amount: 100, date: "2026-10-27" },
-  ]);
-  const [currentTransaction, setCurrentTransaction] = useState(null);
-  const [isAddEditMode, setIsAddEditMode] = useState(false);
+  const [books, setBooks] = useState([]);
+  const [currentBook, setCurrentBook] = useState(null);
+  const [showForm, setShowForm] = useState(false);
 
-  const handleDelete = (id) => {
-    const updatedTransactions = transactions.filter(
-      (transaction) => transaction.id !== id,
-    );
-    setTransactions(updatedTransactions);
+  const fetchBooks = async () => {
+    try {
+      const response = await fetch(API_URL);
+      const result = await response.json();
+      setBooks(result.data || []);
+    } catch (error) {
+      console.error("Error fetching books:", error);
+    }
   };
+
+  useEffect(() => {
+    fetchBooks();
+  }, []);
 
   const handleAdd = () => {
-    setCurrentTransaction(null);
-    setIsAddEditMode(true);
+    setCurrentBook(null);
+    setShowForm(true);
   };
 
-  const handleEdit = (transaction) => {
-    setCurrentTransaction(transaction);
-    setIsAddEditMode(true);
+  const handleEdit = (book) => {
+    setCurrentBook(book);
+    setShowForm(true);
   };
 
-  const saveFormData = (payload) => {
-    if (payload.id) {
-      //Edit existing transaction
-      const updatedTransactions = transactions.map((t) =>
-        t.id === payload.id ? payload : t,
+  const saveFormData = async (book) => {
+    try {
+      const isEdit = Boolean(book._id);
+
+      const response = await fetch(
+        isEdit ? `${API_URL}/${book._id}` : API_URL,
+        {
+          method: isEdit ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: book.title,
+            author: book.author,
+            category: book.category,
+            price: Number(book.price),
+          }),
+        }
       );
-      setTransactions(updatedTransactions);
-    } else {
-      //Add new transaction
-      const newTransaction = { ...payload, id: transactions.length + 1 };
-      setTransactions([...transactions, newTransaction]);
+
+      if (!response.ok) throw new Error("Unable to save book");
+
+      setShowForm(false);
+      setCurrentBook(null);
+      await fetchBooks();
+    } catch (error) {
+      alert(error.message);
     }
-    setIsAddEditMode(false);
-    setCurrentTransaction(null);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this book?")) return;
+
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error("Unable to delete book");
+
+      await fetchBooks();
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   return (
     <div className="app-container">
       <Header handleAdd={handleAdd} />
-      <h2>Expenses</h2>
+
+      <h2>Books</h2>
+
       <table>
         <thead>
           <tr>
             <th>Title</th>
-            <th>Amount</th>
-            <th>Date</th>
+            <th>Author</th>
+            <th>Category</th>
+            <th>Price</th>
             <th>Actions</th>
           </tr>
         </thead>
+
         <tbody>
-          {transactions.map((transaction, index) => (
-            <tr key={transaction.id}>
-              <td>{transaction.title}</td>
-              <td>{transaction.amount}</td>
-              <td>{transaction.date}</td>
+          {books.map((book) => (
+            <tr key={book._id}>
+              <td>{book.title}</td>
+              <td>{book.author}</td>
+              <td>{book.category}</td>
+              <td>{book.price}</td>
               <td>
-                <button onClick={() => handleEdit(transaction)}>Edit</button>
-                <button onClick={() => handleDelete(transaction.id)}>
+                <button onClick={() => handleEdit(book)}>Edit</button>
+                <button onClick={() => handleDelete(book._id)}>
                   Delete
                 </button>
               </td>
@@ -74,10 +113,12 @@ function App() {
           ))}
         </tbody>
       </table>
-      <h3>Total Expenses: {calculateTotalExpenses(transactions)}</h3>
-      {isAddEditMode && (
+
+      {books.length === 0 && <p>No books found.</p>}
+
+      {showForm && (
         <AddEditForm
-          currentTransaction={currentTransaction}
+          currentTransaction={currentBook}
           saveFormData={saveFormData}
         />
       )}
