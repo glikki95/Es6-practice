@@ -1,12 +1,15 @@
 
 import express from 'express';
+import cors from 'cors';
 import { MongoClient, ObjectId } from 'mongodb';
 
 const app = express();
 
+// Middleware
+app.use(cors());
 app.use(express.json());
 
-// MongoDB connection from Environment Variable
+// MongoDB connection
 const url = process.env.MONGODB_URI;
 const dbName = 'booksdb';
 
@@ -37,7 +40,6 @@ async function connectDB() {
 
 connectDB();
 
-
 // CREATE - POST
 app.post('/api/v1/books', async (req, res) => {
     try {
@@ -61,12 +63,10 @@ app.post('/api/v1/books', async (req, res) => {
     }
 });
 
-
 // READ - GET ALL BOOKS
 app.get('/api/v1/books', async (req, res) => {
     try {
         const { category } = req.query;
-
         const query = category ? { category } : {};
 
         const result = await db.collection('books')
@@ -85,7 +85,6 @@ app.get('/api/v1/books', async (req, res) => {
         });
     }
 });
-
 
 // READ - GET BOOK BY ID
 app.get('/api/v1/books/:id', async (req, res) => {
@@ -120,7 +119,6 @@ app.get('/api/v1/books/:id', async (req, res) => {
         });
     }
 });
-
 
 // UPDATE - PUT
 app.put('/api/v1/books/:id', async (req, res) => {
@@ -157,7 +155,6 @@ app.put('/api/v1/books/:id', async (req, res) => {
     }
 });
 
-
 // DELETE
 app.delete('/api/v1/books/:id', async (req, res) => {
     try {
@@ -190,7 +187,6 @@ app.delete('/api/v1/books/:id', async (req, res) => {
         });
     }
 });
-
 
 // 404 ROUTE
 app.use((req, res) => {
