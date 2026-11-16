@@ -1,9 +1,8 @@
-
 {
   "name": "express",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "node ser.js"
+    "start": "node server.js"
   }
 }
