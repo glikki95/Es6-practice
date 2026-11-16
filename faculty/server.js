@@ -1,3 +1,4 @@
+
 import express from "express";
 import fs from "fs";
 
@@ -5,14 +6,12 @@ const app = express();
 
 app.use(express.json());
 
-
 // Read data from faculty.json
 const readData = () => {
     return JSON.parse(
         fs.readFileSync("./faculty.json", "utf-8")
     );
 };
-
 
 // Write data to faculty.json
 const writeData = (data) => {
@@ -22,10 +21,8 @@ const writeData = (data) => {
     );
 };
 
-
-// Create a faculty member
+// POST - Create faculty
 app.post("/api/v1/faculty", (req, res) => {
-
     const allFaculty = readData();
 
     const nextId =
@@ -39,7 +36,6 @@ app.post("/api/v1/faculty", (req, res) => {
     };
 
     allFaculty.push(newFaculty);
-
     writeData(allFaculty);
 
     res.status(201).json({
@@ -48,10 +44,8 @@ app.post("/api/v1/faculty", (req, res) => {
     });
 });
 
-
-// Get all faculty with Query Parameter
+// GET - Get all faculty
 app.get("/api/v1/faculty", (req, res) => {
-
     const { dept } = req.query;
 
     let allFaculty = readData();
@@ -68,12 +62,9 @@ app.get("/api/v1/faculty", (req, res) => {
     });
 });
 
-
-// Get a faculty member by ID
+// GET - Get faculty by ID
 app.get("/api/v1/faculty/:id", (req, res) => {
-
     const facultyId = parseInt(req.params.id);
-
     const allFaculty = readData();
 
     const faculty = allFaculty.find(
@@ -81,26 +72,20 @@ app.get("/api/v1/faculty/:id", (req, res) => {
     );
 
     if (faculty) {
-
         res.status(200).json({
             message: "Faculty retrieved successfully",
             data: faculty
         });
-
     } else {
-
         res.status(404).json({
             message: "Faculty not found"
         });
     }
 });
 
-
-// Update a faculty member
+// PUT - Update faculty
 app.put("/api/v1/faculty/:id", (req, res) => {
-
     const facultyId = parseInt(req.params.id);
-
     const allFaculty = readData();
 
     const facultyIndex = allFaculty.findIndex(
@@ -108,35 +93,28 @@ app.put("/api/v1/faculty/:id", (req, res) => {
     );
 
     if (facultyIndex !== -1) {
-
         const updatedFaculty = {
             ...allFaculty[facultyIndex],
             ...req.body
         };
 
         allFaculty[facultyIndex] = updatedFaculty;
-
         writeData(allFaculty);
 
         res.status(200).json({
             message: "Faculty updated successfully",
             data: updatedFaculty
         });
-
     } else {
-
         res.status(404).json({
             message: "Faculty not found"
         });
     }
 });
 
-
-// Delete a faculty member
+// DELETE - Delete faculty
 app.delete("/api/v1/faculty/:id", (req, res) => {
-
     const facultyId = parseInt(req.params.id);
-
     const allFaculty = readData();
 
     const facultyIndex = allFaculty.findIndex(
@@ -144,7 +122,6 @@ app.delete("/api/v1/faculty/:id", (req, res) => {
     );
 
     if (facultyIndex !== -1) {
-
         const deletedFaculty =
             allFaculty.splice(facultyIndex, 1)[0];
 
@@ -154,19 +131,16 @@ app.delete("/api/v1/faculty/:id", (req, res) => {
             message: "Faculty deleted successfully",
             data: deletedFaculty
         });
-
     } else {
-
         res.status(404).json({
             message: "Faculty not found"
         });
     }
 });
 
-
 // Start server
-app.listen(8080, () => {
-    console.log(
-        "Server running at http://localhost:8080/api/v1/faculty"
-    );
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, () => {
+    console.log(`Server running at port ${PORT}`);
 });
