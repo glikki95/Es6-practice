@@ -1,0 +1,3 @@
+doskey /history > crud_commands.txt
+cd "C:\Users\vamsi\OneDrive\Desktop\Es6 practice"
+doskey /history > crud_commands.txt

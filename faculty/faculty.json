@@ -1,0 +1,32 @@
+[
+  {
+    "id": 3,
+    "name": "Dr.Ravi",
+    "dept": "ECE",
+    "subject": "DE"
+  },
+  {
+    "id": 4,
+    "name": "Kiran",
+    "dept": "CSE",
+    "salary": 60000
+  },
+  {
+    "id": 5,
+    "name": "Dr. John Doe",
+    "dept": "CSE",
+    "designation": "Professor"
+  },
+  {
+    "id": 6,
+    "name": "Dr. John Doe",
+    "dept": "CSE",
+    "designation": "Professor"
+  },
+  {
+    "id": 7,
+    "name": "Dr. John Doe",
+    "dept": "CSE",
+    "designation": "Professor"
+  }
+]
